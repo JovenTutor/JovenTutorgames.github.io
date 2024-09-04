@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos de Matemáticas</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://cdn.pixabay.com/photo/2024/09/04/13/40/13-40-00-357_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        #game-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #4CAF50;
+        }
+        .question {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        input {
+            font-size: 1.2em;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .ad-space {
+            margin: 30px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px dashed #ccc;
+            color: #666;
+            font-size: 1.2em;
+        }
+        #adblock-message {
+            display: none;
+            color: red;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="adblock-message">
+        Por favor, desactiva tu bloqueador de anuncios para continuar disfrutando de los juegos.
+    </div>
+
+    <div id="game-container">
+        <!-- Juego de Tablas de Multiplicar -->
+        <h1>Juego de Tablas de Multiplicar</h1>
+        <div id="question-multiplication" class="question"></div>
+        <input type="number" id="answer-multiplication" placeholder="Tu respuesta">
+        <button onclick="checkAnswer('multiplication')">Enviar</button>
+        <div id="result-multiplication" class="result"></div>
+        <div class="ad-space">Espacio para publicidad</div>
+
+        <!-- Juego de Sumas -->
+        <h1>Juego de Sumas</h1>
+        <div id="question-addition" class="question"></div>
+        <input type="number" id="answer-addition" placeholder="Tu respuesta">
+        <button onclick="checkAnswer('addition')">Enviar</button>
+        <div id="result-addition" class="result"></div>
+        <div class="ad-space">Espacio para publicidad</div>
+
+        <!-- Juego de Divisiones -->
+        <h1>Juego de Divisiones</h1>
+        <div id="question-division" class="question"></div>
+        <input type="number" id="answer-division" placeholder="Tu respuesta">
+        <button onclick="checkAnswer('division')">Enviar</button>
+        <div id="result-division" class="result"></div>
+        <div class="ad-space">Espacio para publicidad</div>
+
+        <!-- Juego Mental -->
+        <h1>Juego Mental</h1>
+        <div id="question-mental" class="question"></div>
+        <input type="number" id="answer-mental" placeholder="Tu respuesta">
+        <button onclick="checkAnswer('mental')">Enviar</button>
+        <div id="result-mental" class="result"></div>
+    </div>
+
+    <script>
+        // Detecta si el usuario tiene un bloqueador de anuncios
+        window.onload = function() {
+            const adBlockEnabled = typeof document.getElementsByClassName('ad-space')[0].offsetHeight === 'undefined' || document.getElementsByClassName('ad-space')[0].offsetHeight === 0;
+            if (adBlockEnabled) {
+                document.getElementById('adblock-message').style.display = 'block';
+                document.getElementById('game-container').style.display = 'none';
+            }
+        };
+
+        function setupEventListeners(id) {
+            document.getElementById(`answer-${id}`).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer(id);
+                }
+            });
+        }
+
+        function initializeGame(id, questionFunc, answerId, resultId) {
+            window[`num1${id}`] = 0;
+            window[`num2${id}`] = 0;
+            window[`correctAnswer${id}`] = 0;
+
+            function generateQuestion() {
+                window[`num1${id}`] = Math.floor(Math.random() * 10) + 1;
+                window[`num2${id}`] = Math.floor(Math.random() * 10) + 1;
+                window[`correctAnswer${id}`] = questionFunc();
+                document.getElementById(`question-${id}`).innerText = `¿Cuánto es ${window[`num1${id}`]} ${window[`num2${id}`]}?`;
+                document.getElementById(resultId).innerText = '';
+                document.getElementById(answerId).value = '';
+                document.getElementById(answerId).focus();
+            }
+
+            function checkAnswer() {
+                const userAnswer = parseInt(document.getElementById(answerId).value, 10);
+                if (userAnswer === window[`correctAnswer${id}`]) {
+                    document.getElementById(resultId).innerText = '¡Correcto!';
+                    document.getElementById(resultId).style.color = 'green';
+                } else {
+                    document.getElementById(resultId).innerText = `Incorrecto. La respuesta correcta es ${window[`correctAnswer${id}`]}.`;
+                    document.getElementById(resultId).style.color = 'red';
+                }
+                setTimeout(generateQuestion, 2000);
+            }
+
+            setupEventListeners(id);
+            generateQuestion();
+            window[`checkAnswer${id}`] = checkAnswer;
+        }
+
+        // Define las funciones para cada tipo de pregunta
+        function multiplicationQuestion() {
+            return window[`num1multiplication`] * window[`num2multiplication`];
+        }
+        function additionQuestion() {
+            return window[`num1addition`] + window[`num2addition`];
+        }
+        function divisionQuestion() {
+            return (window[`num1division`] * window[`num2division`]) / window[`num1division`];
+        }
+        function mentalQuestion() {
+            return window[`num1mental`] * window[`num2mental`];
+        }
+
+        // Inicializa todos los juegos
+        initializeGame('multiplication', multiplicationQuestion, 'answer-multiplication', 'result-multiplication');
+        initializeGame('addition', additionQuestion, 'answer-addition', 'result-addition');
+        initializeGame('division', divisionQuestion, 'answer-division', 'result-division');
+        initializeGame('mental', mentalQuestion, 'answer-mental', 'result-mental');
+    </script>
+</body>
+</html>
